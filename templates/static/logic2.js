@@ -15,28 +15,13 @@ L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={
   accessToken: API_KEY
 }).addTo(myMap);
 
-changeMapFunction = function( {data,label,map} ) {
+changeMapFunction = function( {label,value,map} ) {
   map.eachLayer(function (layer) {
       if (layer instanceof L.Marker) {
         map.removeLayer(layer);
       }
   });
   
-  var markerArray = [];
-  L.geoJson(filteredData, {
-          onEachFeature: function onEachFeature(layer) {
-            content = ("<h2> Date:  " + earthquake.Date + "</h2> <hr> <h3>Magnitude: " + earthquake.Magnitude + "</h3>")
-            var popup = L.popup().setContent(content);
-            layer.bindPopup(popup);
-            markerArray.push(layer);
-          }
-      }).addTo(myMap);
-
-  L.control.timelineSlider({
-      timelineItems: ["1965 to 1975", "1975 to 1985", "1985 to 1995", "1995 to 2005", "2005 to 2015", "2015 to Present"], 
-      changeMap: changeMapFunction })
-  .addTo(myMap);                  
-
 d3.json(defaultURL).then(function(data) {
 
     var dataLabels = {
@@ -67,10 +52,30 @@ d3.json(defaultURL).then(function(data) {
           year: earthquake.Year,
           magnitude: earthquake.Magnitude,
           date: earthquake.Date}});
+        console.log(filteredData)
 
-    filteredData.forEach((earthquake) => {
-      L.marker(earthquake.location).addTo(myMap);
-    })
+      var markerArray = [];
+      L.geoJson(filteredData, {
+          onEachFeature: function onEachFeature(layer) {
+            content = ("<h2> Date:  " + earthquake.Date + "</h2> <hr> <h3>Magnitude: " + earthquake.Magnitude + "</h3>")
+            var popup = L.popup().setContent(content);
+            layer.bindPopup(popup);
+            markerArray.push(layer);
+          }
+      }).addTo(myMap);
 
-});
+  // L.marker(earthquake.location)
+  //   .bindPopup("<h1> Year" + earthquake.year + "</h1> <hr> <h3>Magnitude " + earthquake.magnitude + "</h3>")
+  //   .addTo(myMap);
+
+    // filteredData.forEach((earthquake) => {
+    //   L.marker(earthquake.location).addTo(myMap);
+    // })
+      // var markerGroup = L.featureGroup(markerArray);
+      //           map.fitBounds(markerGroup.getBounds()).setZoom(12);
+})
 }
+L.control.timelineSlider({
+   timelineItems: ["1965 to 1975", "1975 to 1985", "1985 to 1995", "1995 to 2005", "2005 to 2015", "2015 to Present"], 
+   changeMap: changeMapFunction })
+ .addTo(myMap); 
